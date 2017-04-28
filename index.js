@@ -123,12 +123,12 @@ function start () {
   }
 
   macros.forEach((macro) => {
-    console.log(`(${macro.key}) será pressionada a cada ${macro.time} segundos`)
+    console.log(`(${macro.key}) será pressionada a cada ${macro.seconds} segundos`)
     setInterval(macro.keyTap, macro.ms)
   })
 
   console.log()
   console.log('Toda as as macros foram inicializadas.')
-  console.log('Deixe a janela do Tibia selecionada para que elas tenham efeitos')
+  console.log('Deixe a janela do Tibia selecionada para que elas tenham efeitos.')
   console.log('NÃO FECHE ESTA JANELA!')
 }
