@@ -83,7 +83,7 @@ Macro Criada!
 
 Repita este passo para adicionar quantas macros forem necessárias.
 
-### Executando as MacrosK
+### Executando as Macros
 
 Para iniciar a execução das macros que você criou, digite __2__.
 
