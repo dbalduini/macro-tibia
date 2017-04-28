@@ -29,10 +29,7 @@ Node v7.9.0
 npm start
 ```
 
-## Interface Desktop
-Não implementado.
-
-## Como usar
+## Linha de comando - Como usar
 
 Ao iniciar a execução, o programa irá pedir por um número de comando:
 
@@ -102,3 +99,6 @@ NÃO FECHE ESTA JANELA!
 ```
 
 Para parar o programa, pressione `ctrl+c`.
+
+## Interface Desktop
+Não implementado.
