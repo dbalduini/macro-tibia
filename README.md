@@ -1,5 +1,9 @@
 # macro-tibia
-Tibia macro by command line
+Cria macros com execução em intervalos.
+
+O programa se chama __macro-tibia__ pois foi criado para ser usado como macros para o jogo Tibia.
+
+Entretando, este programa cria macros que podem ser executadas em qualquer janela, ex: Bloco de notas, VLC, Chrome Browser, etc...
 
 ## Requisitos
 
@@ -48,18 +52,24 @@ Pressione as teclas da Macro agora:
 
 Digite qualquer tecla (algumas não irão funcionar, como Command no MacOs) do teclado, exemplo:
 
+```
 > k
 > l
 > 1
 > SHIFT + k
 > CTRL + l
+```
+
+Uma janela de confirmação será apresentada, digite **s** para confirmar.
 
 ```
 Você entrou com a Macro: [SHIFT + k]
 Confirma? (s/n) => s
 ```
 
-Em seguinda informe a periodicidade em segundos a qual a macro será executada, ex: a cada 10 segundos
+Em seguinda informe o intervalo de tempo em segundos em que a macro será executada.
+
+Ex: a cada 10 segundos:
 
 ```
 A cada quantos segundos? => 10
