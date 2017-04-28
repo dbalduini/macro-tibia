@@ -49,7 +49,6 @@ function createNewMacro (macro) {
   macro.ms = inSeconds(macro.seconds)
 
   macro.keyTap = function () {
-    console.log('Pressionando [' + macro.key + ']')
     robot.keyTap(macro.key, modified)
   }
 
@@ -89,18 +88,16 @@ function askConfirmation (robotKey) {
 
 function parseKeypressed (str, key) {
   let robotKey = {}
-  let name = key ? key.name : str
 
   if (typeof key === 'object') {
     robotKey.shift = key.shift
     robotKey.ctrl = key.ctrl
+    robotKey.key = key.name || str
   }
 
-  if (name === 'return') {
-    name = 'enter'
+  if (robotKey.key === 'return') {
+    robotKey.key = 'enter'
   }
-
-  robotKey.key = name
 
   return robotKey
 }
@@ -117,9 +114,10 @@ function readNewMacro (input) {
 function start () {
   console.log('Iniciando as macros ...\n')
 
+  rl.pause()
   if (macros.length === 0) {
     console.log('Nenhuma macro para inicializar. Tchau!')
-    return
+    process.exit(0)
   }
 
   macros.forEach((macro) => {
@@ -127,8 +125,10 @@ function start () {
     setInterval(macro.keyTap, macro.ms)
   })
 
-  console.log()
+  console.log('\n=================================================================')
   console.log('Toda as as macros foram inicializadas.')
   console.log('Deixe a janela do Tibia selecionada para que elas tenham efeitos.')
   console.log('NÃO FECHE ESTA JANELA!')
+  console.log('=================================================================\n')
+  rl.clearLine()
 }
