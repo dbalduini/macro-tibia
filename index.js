@@ -2,18 +2,16 @@
 
 const robot = require('robotjs')
 const readline = require('readline')
-const util = require('util')
-
 const inSeconds = (ms) => ms * 1000
-const inMinutes = (ms) => inSeconds(ms) * 60
+// const inMinutes = (ms) => inSeconds(ms) * 60
 const macros = []
 
 const rl = readline.createInterface({
-  input  : process.stdin,
-  output : process.stdout
+  input: process.stdin,
+  output: process.stdout
 })
 
-readline.emitKeypressEvents(process.stdin);
+readline.emitKeypressEvents(process.stdin)
 // process.stdin.setRawMode(true);
 
 function printHelp () {
@@ -69,16 +67,15 @@ function askDuration (robotKey) {
   })
 }
 
-function askConfirmation(robotKey) {
+function askConfirmation (robotKey) {
   let question = 'Você entrou com a Macro: ['
 
   if (robotKey.shift) {
-    question  += 'SHIFT + '
+    question += 'SHIFT + '
   } else if (robotKey.ctrl) {
-    question  += 'CTRL + '
+    question += 'CTRL + '
   }
   question += robotKey.key + ']\nConfirma? (s/n) => '
-
 
   rl.question(question, (answer) => {
     if (answer.toUpperCase() === 'S') {
@@ -108,7 +105,7 @@ function parseKeypressed (str, key) {
   return robotKey
 }
 
-function readNewMacro(input) {
+function readNewMacro (input) {
   console.log('Pressione as teclas da Macro agora:')
   process.stdin.once('keypress', (str, key) => {
     rl.prompt()
@@ -127,8 +124,8 @@ function start () {
 
   macros.forEach((macro) => {
     console.log(`(${macro.key}) será pressionada a cada ${macro.time} segundos`)
-    setInterval(macro.keyTap, macro.ms);
-  });
+    setInterval(macro.keyTap, macro.ms)
+  })
 
   console.log()
   console.log('Toda as as macros foram inicializadas.')
