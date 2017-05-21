@@ -9,6 +9,8 @@ Entretando, este programa cria macros que podem ser executadas em qualquer janel
 
 Node v7.9.0
 
+Click [AQUI](https://nodejs.org/en/) para download.
+
 ## Linha de comando
 
 1. Clone o macro-tibia ou faça download do zip do mesmo.
