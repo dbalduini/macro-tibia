@@ -1,11 +1,10 @@
 const robot = require('robotjs')
-
-const secondsToMillis = ms => ms * 1000
-// const inMinutes = (ms) => inSeconds(ms) * 60
+const rand = require('./rand')
 
 function Macro () {
-  this.start = () => {}
-  this.stop = () => {}
+  this.started = false
+  this.cancel = false
+  this.debugMode = process.env.NODE_ENV === 'debug'
 }
 
 // Factory function to create macros
@@ -52,14 +51,22 @@ Macro.prototype.registerKeyTapInterval = function (seconds) {
 
   this.seconds = seconds
 
-  // register interval
-  this.start = function () {
-    let timeout = setInterval(() => {
-      robot.keyTap(key, modified)
-    }, secondsToMillis(seconds))
-
-    self.stop = () => {
-      clearTimeout(timeout)
+  this.keyTapInterval = function (ms) {
+    if (self.debugMode) {
+      console.log(self.prettify(), 'executed after', ms, 'ms')
     }
+    robot.keyTap(key, modified)
   }
+}
+
+Macro.prototype.start = function () {
+  const self = this
+  const s = this.seconds
+  console.log('Executando macro', this.prettify(), 'entre 1 e', s, 'segundos.')
+  var cancel = rand.randomInterval(this.keyTapInterval, s)
+  this.cancel = cancel;
+}
+
+Macro.prototype.stop = function () {
+  this.cancel()
 }

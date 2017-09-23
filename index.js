@@ -18,7 +18,23 @@ main()
 function main () {
   console.log('Programa iniciado em:', new Date())
   console.log('Para sair a qualquer momento, pressione (Ctrl+C)')
+  startReadlineEventListeners()
   printHelp()
+}
+
+function startReadlineEventListeners () {
+  rl.on('line', (line) => {
+    let input = line.trim()
+    console.log(`Selecionado [${input}]`)
+    if (input === '2') {
+      start()
+    }
+    if (input === '1') {
+      readNewMacro(input)
+    }
+  })
+
+  rl.on('SIGINT', shutdown)
 }
 
 function printHelp () {
@@ -27,19 +43,6 @@ function printHelp () {
   console.log('[2] = Iniciar')
   rl.prompt()
 }
-
-rl.on('line', (line) => {
-  let input = line.trim()
-  console.log(`Selecionado [${input}]`)
-  if (input === '2') {
-    start()
-  }
-  if (input === '1') {
-    readNewMacro(input)
-  }
-})
-
-rl.on('SIGINT', shutdown)
 
 function readNewMacro (input) {
   console.log('Pressione as teclas da Macro agora:')
@@ -54,8 +57,8 @@ function readNewMacro (input) {
 function askConfirmation (macro) {
   let question = 'Você entrou com a Macro: '
 
-  question += macro.prettify()
-  question += '\nConfirma? (s/n) => '
+  question += macro.prettify() + '\n'
+  question += 'Confirma? (s/n) => '
 
   rl.question(question, (answer) => {
     if (answer.toUpperCase() === 'S') {
@@ -99,7 +102,6 @@ function start () {
   }
 
   macros.forEach((macro) => {
-    console.log(macro.prettify(), 'será pressionada a cada', macro.seconds, 'segundos')
     macro.start()
   })
 
@@ -118,13 +120,14 @@ function start () {
 
 // Gracefull shutdown
 function shutdown() {
-  console.log("\nTerminando o programa agora...\n")
+  console.log("\nTerminando o programa agora, aguarde...\n")
+
+  if (macros.length === 0) {
+    process.exit(0)
+  }
 
   macros.forEach(macro => {
-    console.log('Parando macro:', macro.prettify())
+    console.log('Cancelando macro:', macro.prettify())
     macro.stop()
   })
-
-  console.log("\nTchau! <3")
-  process.exit(0)
 }
