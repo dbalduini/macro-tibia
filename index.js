@@ -1,9 +1,8 @@
 'use strict'
 
-const robot = require('robotjs')
 const readline = require('readline')
-const inSeconds = (ms) => ms * 1000
-// const inMinutes = (ms) => inSeconds(ms) * 60
+const Macro = require('./macro')
+
 const macros = []
 
 const rl = readline.createInterface({
@@ -14,15 +13,20 @@ const rl = readline.createInterface({
 readline.emitKeypressEvents(process.stdin)
 // process.stdin.setRawMode(true);
 
+main()
+
+function main () {
+  console.log('Programa iniciado em:', new Date())
+  console.log('Para sair a qualquer momento, pressione (Ctrl+C)')
+  printHelp()
+}
+
 function printHelp () {
-  console.log()
-  console.log('Digite o número para executar um comando:')
+  console.log('\nDigite o número para executar um comando:')
   console.log('[1] = Adicionar Macro')
   console.log('[2] = Iniciar')
   rl.prompt()
 }
-
-printHelp()
 
 rl.on('line', (line) => {
   let input = line.trim()
@@ -35,80 +39,54 @@ rl.on('line', (line) => {
   }
 })
 
-function createNewMacro (macro) {
-  let modified = []
-
-  if (macro.shift) {
-    modified.push('shift')
-  }
-
-  if (macro.ctrl) {
-    modified.push('ctrl')
-  }
-
-  macro.ms = inSeconds(macro.seconds)
-
-  macro.keyTap = function () {
-    robot.keyTap(macro.key, modified)
-  }
-
-  console.log('Macro Criada!')
-  console.log(JSON.stringify(macro, null, 2))
-  macros.push(macro)
-}
-
-function askDuration (robotKey) {
-  rl.question('A cada quantos segundos? => ', (seconds) => {
-    console.log('>', seconds)
-    robotKey.seconds = seconds
-    createNewMacro(robotKey)
-    printHelp()
-  })
-}
-
-function askConfirmation (robotKey) {
-  let question = 'Você entrou com a Macro: ['
-
-  if (robotKey.shift) {
-    question += 'SHIFT + '
-  } else if (robotKey.ctrl) {
-    question += 'CTRL + '
-  }
-  question += robotKey.key + ']\nConfirma? (s/n) => '
-
-  rl.question(question, (answer) => {
-    if (answer.toUpperCase() === 'S') {
-      askDuration(robotKey)
-    } else {
-      console.log('Negado, a macro não será criada!')
-      printHelp()
-    }
-  })
-}
-
-function parseKeypressed (str, key) {
-  let robotKey = {}
-
-  if (typeof key === 'object') {
-    robotKey.shift = key.shift
-    robotKey.ctrl = key.ctrl
-    robotKey.key = key.name || str
-  }
-
-  if (robotKey.key === 'return') {
-    robotKey.key = 'enter'
-  }
-
-  return robotKey
-}
+rl.on('SIGINT', shutdown)
 
 function readNewMacro (input) {
   console.log('Pressione as teclas da Macro agora:')
   process.stdin.once('keypress', (str, key) => {
     rl.prompt()
     rl.clearLine()
-    askConfirmation(parseKeypressed(str, key))
+    const macro = Macro.fromKeypressed(str, key)
+    askConfirmation(macro)
   })
+}
+
+function askConfirmation (macro) {
+  let question = 'Você entrou com a Macro: '
+
+  question += macro.prettify()
+  question += '\nConfirma? (s/n) => '
+
+  rl.question(question, (answer) => {
+    if (answer.toUpperCase() === 'S') {
+      askDuration(macro)
+    } else {
+      failMacro()
+    }
+  })
+}
+
+function askDuration (macro) {
+  rl.question('A cada quantos segundos? => ', (seconds) => {
+    console.log('>', seconds)
+    if (seconds < 1) {
+      failMacro('Impossível criar macro menor que 1 segundo!')
+    } else {
+      macro.registerKeyTapInterval(seconds)
+      macros.push(macro)
+      console.log('Macro Criada!')
+      console.log(macro.prettify(), 'a cada', macro.seconds, 'segundos')
+    }
+    printHelp()
+  })
+}
+
+function failMacro (err) {
+  console.log('\nA macro não será criada!')
+  if (err) {
+    console.error(err);
+  }
+  printHelp()
 }
 
 function start () {
@@ -121,14 +99,32 @@ function start () {
   }
 
   macros.forEach((macro) => {
-    console.log(`(${macro.key}) será pressionada a cada ${macro.seconds} segundos`)
-    setInterval(macro.keyTap, macro.ms)
+    console.log(macro.prettify(), 'será pressionada a cada', macro.seconds, 'segundos')
+    macro.start()
   })
 
   console.log('\n=================================================================')
   console.log('Toda as as macros foram inicializadas.')
   console.log('Deixe a janela do Tibia selecionada para que elas tenham efeitos.')
   console.log('NÃO FECHE ESTA JANELA!')
+  console.log('Pressione (Ctrl+C) para terminar o programa.')
   console.log('=================================================================\n')
+
   rl.clearLine()
+  rl.close()
+
+  process.on('SIGINT', shutdown)
+}
+
+// Gracefull shutdown
+function shutdown() {
+  console.log("\nTerminando o programa agora...\n")
+
+  macros.forEach(macro => {
+    console.log('Parando macro:', macro.prettify())
+    macro.stop()
+  })
+
+  console.log("\nTchau! <3")
+  process.exit(0)
 }
